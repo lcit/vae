@@ -98,11 +98,12 @@ class Decoder(nn.Module):
         self.block1 = UpBlock(128, 64)
         self.block2 = UpBlock(64, 32)
         self.block3 = nn.Conv2d(32, 1, kernel_size=1)
+        self.linear = nn.Linear(128*7*7, 128*7*7)
         
     def forward(self, z):
-        # z: (B, 64, H, W)
-        
-        x = z.view(z.size(0), 128, 7, 7)
+
+        x = self.linear(z)
+        x = x.view(x.size(0), 128, 7, 7)
         
         x = self.block1(x) # (B, 64, 14, 14)
         x = self.block2(x) # (B, 32, 28, 28)
@@ -112,7 +113,7 @@ class Decoder(nn.Module):
         
 class VAE(nn.Module):
     
-    def __init__(self, alpha=0.1):
+    def __init__(self, alpha=0.5):
         super().__init__()
         
         self.alpha = alpha

@@ -1,6 +1,7 @@
 import torch
 import torchvision
 import numpy as np
+import os
 from vae import VAE
 
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
@@ -8,7 +9,7 @@ device = 'cuda' if torch.cuda.is_available() else 'cpu'
 class MNISTDataset(torch.utils.data.Dataset):
     
     def __init__(self, ):
-        self.mnist = torchvision.datasets.MNIST(".")
+        self.mnist = torchvision.datasets.MNIST(".", download=True)
         
     def __len__(self):
         return len(self.mnist)
@@ -50,9 +51,10 @@ if __name__=="__main__":
             out = model(images)
             loss = out['loss']
             
-            print(f"Iteration {iteration}")
-            for name, value in out.items():
-                print(f"\t{name}: {value}")
+            if iteration%100==0:
+                print(f"Iteration {iteration}")
+                for name, value in out.items():
+                    print(f"\t{name}: {value}")
             
             loss.backward()
             optimizer.step()
@@ -61,3 +63,8 @@ if __name__=="__main__":
                 lr_scheduler.step()            
             
             iteration += 1
+            
+            name = "model"
+            if iteration%10000==0:
+                torch.save(model.state_dict(), 
+                           os.path.join(".", f"{name}_{iteration:06d}.pickle"))
