@@ -2,6 +2,8 @@ import torch
 import torchvision
 import numpy as np
 import os
+
+from models import vae_mnist
 from vae import VAE
 
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
@@ -24,12 +26,12 @@ class MNISTDataset(torch.utils.data.Dataset):
 if __name__=="__main__":
     
     dataset = torch.utils.data.DataLoader(MNISTDataset(), 
-                                          batch_size=4, 
+                                          batch_size=8, 
                                           pin_memory=True, 
                                           shuffle=True,
                                           num_workers=8)
     
-    model = VAE().to(device)
+    model = VAE(vae_mnist).to(device)
     model.train()
     
     optimizer = torch.optim.Adam(model.parameters(), lr=1e-4, weight_decay=1e-5)
